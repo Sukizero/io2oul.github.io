@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-    <head hexo-theme='https://github.com/volantis-x/hexo-theme-volantis/#6.0.0-alpha.0'>
+    <head hexo-theme='https://github.com/volantis-x/hexo-theme-volantis/#6.0.0-alpha.1'>
   <meta name="generator" content="Hexo 6.3.0">
-  <meta name="Volantis" content="6.0.0-alpha.0">
+  <meta name="Volantis" content="6.0.0-alpha.1">
   <meta charset="utf-8">
   <!-- SEO相关 -->
   <meta name="robots" content="index,follow">
@@ -1737,24 +1737,6 @@ if (/*@cc_on!@*/false || (!!window.MSInputMethodContext && !!document.documentMo
   window.volantis = {}; // volantis 全局变量
   volantis.debug = "env"; // 调试模式
   volantis.dom = {}; // 页面Dom see: /source/js/app.js etc.
-  /******************** volantis.EventListener ********************************/
-  // 事件监听器 see: /source/js/app.js
-  volantis.EventListener = {}
-  // 这里存放pjax切换页面时将被移除的事件监听器
-  volantis.EventListener.list = []
-  //构造方法
-  function volantisEventListener(type, f, ele) {
-    this.type = type
-    this.f = f
-    this.ele = ele
-  }
-  // 移除事件监听器
-  volantis.EventListener.remove = () => {
-    volantis.EventListener.list.forEach(function (i) {
-      i.ele.removeEventListener(i.type, i.f, false)
-    })
-    volantis.EventListener.list = []
-  }
   /******************** volantis.dom.$ ********************************/
   // 注：这里没有选择器，也没有forEach一次只处理一个dom，这里重新封装主题常用的dom方法，返回的是dom对象，对象包含了以下方法，同时保留dom的原生API
   function volantisDom(ele) {
@@ -1787,12 +1769,8 @@ if (/*@cc_on!@*/false || (!!window.MSInputMethodContext && !!document.documentMo
       return this.ele
     }
     // ==============================================================
-    // 参数 r 为 true 表示pjax切换页面时事件监听器将被移除，false不移除
-    this.ele.on = (c, f, r = 1) => {
+    this.ele.on = (c, f) => {
       this.ele.addEventListener(c, f, false)
-      if (r) {
-        volantis.EventListener.list.push(new volantisEventListener(c, f, this.ele))
-      }
       return this.ele
     }
     this.ele.click = (f, r) => {
@@ -1867,22 +1845,6 @@ if (/*@cc_on!@*/false || (!!window.MSInputMethodContext && !!document.documentMo
       };
     }
   }
-  /******************** Pjax ********************************/
-  // /layout/_plugins/pjax/index.ejs
-  // volantis.pjax.send(callBack[,"callBackName"]) 传入pjax:send回调函数
-  // volantis.pjax.push(callBack[,"callBackName"]) 传入pjax:complete回调函数
-  // volantis.pjax.error(callBack[,"callBackName"]) 传入pjax:error回调函数
-  volantis.pjax = {};
-  volantis.pjax.method = {
-    complete: new RunItem(),
-    error: new RunItem(),
-    send: new RunItem(),
-  };
-  volantis.pjax = Object.assign(volantis.pjax, {
-    push: volantis.pjax.method.complete.push,
-    error: volantis.pjax.method.error.push,
-    send: volantis.pjax.method.send.push,
-  });
   /******************** RightMenu ********************************/
   // volantis.rightmenu.handle(callBack[,"callBackName"]) 外部菜单项控制
   // 可在 volantis.mouseEvent 处获取右键事件
@@ -1990,7 +1952,7 @@ if (/*@cc_on!@*/false || (!!window.MSInputMethodContext && !!document.documentMo
   }
   /************************ layoutHelper *****************************************/
   volantis.layoutHelper = (helper, html, opt) => {
-    opt = Object.assign({ clean: false, pjax: true }, opt)
+    opt = Object.assign({ clean: false}, opt)
     function myhelper(helper, html, clean) {
       volantis.tempDiv = document.createElement("div");
       volantis.tempDiv.innerHTML = html;
@@ -2003,11 +1965,6 @@ if (/*@cc_on!@*/false || (!!window.MSInputMethodContext && !!document.documentMo
       }
     }
     myhelper(helper, html, opt.clean)
-    if (opt.pjax) {
-      volantis.pjax.push(() => {
-        myhelper(helper, html, opt.clean)
-      }, "layoutHelper-" + helper)
-    }
   }
   /****************************** 滚动事件处理 ****************************************/
   volantis.scroll = {
@@ -2141,12 +2098,18 @@ if (/*@cc_on!@*/false || (!!window.MSInputMethodContext && !!document.documentMo
   }
   /******************************************************************************/
 </script>
+
 <script>
+  window.pdata={}
+  pdata.ispage=false;
+  pdata.commentPath="";
+  pdata.commentPlaceholder="";
+  pdata.commentConfig={};
   volantis.GLOBAL_CONFIG ={
     root: '/',
     debug: "env",
     default: {"avatar":"https://unpkg.com/volantis-static@0.0.1660614606622/media/placeholder/avatar/round/3442075.svg","link":"https://unpkg.com/volantis-static@0.0.1660614606622/media/placeholder/link/8f277b4ee0ecd.svg","cover":"https://unpkg.com/volantis-static@0.0.1660614606622/media/placeholder/cover/76b86c0226ffd.svg","image":"https://unpkg.com/volantis-static@0.0.1660614606622/media/placeholder/image/2659360.svg"},
-    lastupdate: new Date(1671970361032),
+    lastupdate: new Date(1672028958884),
     cdn: {
       izitoast_css: 'https://cdn.bootcdn.net/ajax/libs/izitoast/1.4.0/css/iziToast.min.css',
       izitoast_js: 'https://cdn.bootcdn.net/ajax/libs/izitoast/1.4.0/js/iziToast.min.js',
@@ -2208,7 +2171,7 @@ if (/*@cc_on!@*/false || (!!window.MSInputMethodContext && !!document.documentMo
   <div id='wrapper'>
     <div class='nav-sub'>
       <p class="title"></p>
-      <ul class='switcher nav-list-h m-phone' id="pjax-header-nav-list">
+      <ul class='switcher nav-list-h m-phone'>
         <li><a id="s-comment" class="fa-solid fa-comments fa-fw" target="_self" title="comment"></a></li>
         
           <li><a id="s-toc" class="s-toc fa-solid fa-list fa-fw" target="_self" title="toc"></a></li>
@@ -2471,8 +2434,7 @@ if (/*@cc_on!@*/false || (!!window.MSInputMethodContext && !!document.documentMo
       <div id="l_cover">
   
     
-      <!-- see: /layout/_partial/scripts/_ctrl/coverCtrl.ejs -->
-      <div id="full" class='cover-wrapper  dock' style="display: ;">
+      <div class="cover-wrapper  dock" id='full'>
         
   <div class='cover-bg lazyload placeholder' data-bg="https://gcore.jsdelivr.net/gh/MHG-LAB/cron@gh-pages/bing/bing.jpg"></div>
 
@@ -2537,7 +2499,7 @@ if (/*@cc_on!@*/false || (!!window.MSInputMethodContext && !!document.documentMo
   </div>
 </div>
 
-        <div id="scroll-down" style="display: ;"><i class="fa fa-chevron-down scroll-down-effects"></i></div>
+        <div id="scroll-down"><i class="fa fa-chevron-down scroll-down-effects"></i></div>
       </div>
     
   
@@ -2630,7 +2592,7 @@ Qu...
     
     
       
-<section class="widget blogger desktop mobile pjax">
+<section class="widget blogger desktop mobile ">
   <div class='content'>
     
       
@@ -2715,32 +2677,9 @@ Qu...
   
 
 
-<div class="widget-sticky pjax">
+<div class="widget-sticky">
 
 </div>
-
-
-<!-- 没有 pjax 占位会报错 万恶的 pjax -->
-
-  <div class="pjax">
-    <!-- pjax占位 -->
-  </div>
-
-  <div class="pjax">
-    <!-- pjax占位 -->
-  </div>
-
-  <div class="pjax">
-    <!-- pjax占位 -->
-  </div>
-
-  <div class="pjax">
-    <!-- pjax占位 -->
-  </div>
-
-  <div class="pjax">
-    <!-- pjax占位 -->
-  </div>
 
   <!-- Custom Files side begin -->
   
@@ -2749,34 +2688,6 @@ Qu...
 
 
 
-          <!--此文件用来存放一些不方便取值的变量-->
-<!--思路大概是将值藏到重加载的区域内-->
-
-<pjax>
-<script>
-  window.pdata={}
-  pdata.ispage=false;
-  pdata.commentPath="";
-  pdata.commentPlaceholder="";
-  pdata.commentConfig={};
-  //  see: /layout/_partial/scripts/_ctrl/coverCtrl.ejs
-  
-    // header
-    var l_header=document.getElementById("l_header");
-    
-    l_header.classList.remove("show");
-    
-    
-      // cover
-      var cover_wrapper=document.querySelector('#l_cover .cover-wrapper');
-      var scroll_down=document.getElementById('scroll-down');
-      cover_wrapper.id="full";
-      cover_wrapper.style.display="";
-      scroll_down.style.display="";
-    
-  
-</script>
-</pjax>
         </div>
         
   
@@ -2811,7 +2722,7 @@ Qu...
     
       
         本站使用
-        <a href="https://github.com/volantis-x/hexo-theme-volantis/#6.0.0-alpha.0" target="_blank" class="codename">Volantis</a>
+        <a href="https://github.com/volantis-x/hexo-theme-volantis/#6.0.0-alpha.1" target="_blank" class="codename">Volantis</a>
         作为主题
       
     
@@ -2889,10 +2800,6 @@ Qu...
     
   };
   loadIssuesJS()
-  volantis.pjax.push(()=>{
-    loadIssuesJS();
-  })
-
 </script>
 
 
@@ -2917,9 +2824,6 @@ Qu...
     false
   );
   document.addEventListener('DOMContentLoaded', function () {
-    lazyLoadInstance.update();
-  });
-  document.addEventListener('pjax:complete', function () {
     lazyLoadInstance.update();
   });
 </script>
@@ -2962,7 +2866,7 @@ Qu...
     return document.getElementById("giscus_container");
   }
 
-  function pjax_giscus() {
+  function p_giscus() {
     const HEAD = check_giscus();
     if (!HEAD) return;
     let cfg = Object.assign({"theme":{"light":"light","dark":"dark"}},pdata.commentConfig)
@@ -2990,8 +2894,7 @@ Qu...
     const giscusIframe = document.querySelector('iframe.giscus-frame');
     giscusIframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
   }
-  pjax_giscus();
-  volantis.pjax.push(pjax_giscus);
+  p_giscus();
   volantis.dark.push(dark_giscus);
 </script>
 
@@ -3061,15 +2964,14 @@ Qu...
 
 
 
-  function pjax_highlightjs_copyCode(){
+  function p_highlightjs_copyCode(){
     if (!(document.querySelector(".highlight .code pre") ||
       document.querySelector(".article pre code"))) {
       return;
     }
     VolantisApp.utilCopyCode(".highlight .code pre, .article pre code")
   }
-  volantis.requestAnimationFrame(pjax_highlightjs_copyCode)
-  volantis.pjax.push(pjax_highlightjs_copyCode)
+  volantis.requestAnimationFrame(p_highlightjs_copyCode)
 
 </script>
 
@@ -3087,13 +2989,13 @@ Qu...
     if (!document.querySelectorAll(".swiper-container")[0]) return;
     volantis.css("https://cdn.bootcdn.net/ajax/libs/Swiper/8.3.2/swiper-bundle.min.css");
     volantis.js("https://cdn.bootcdn.net/ajax/libs/Swiper/8.3.2/swiper-bundle.min.js").then(() => {
-      pjax_swiper();
+      p_swiper();
     });
   }
 
   load_swiper();
 
-  function pjax_swiper() {
+  function p_swiper() {
     volantis.swiper = new Swiper('.swiper-container', {
       slidesPerView: 'auto',
       spaceBetween: 8,
@@ -3110,14 +3012,6 @@ Qu...
     });
   }
 
-  volantis.pjax.push(() => {
-    if (!document.querySelectorAll(".swiper-container")[0]) return;
-    if (typeof volantis.swiper === "undefined") {
-      load_swiper();
-    } else {
-      pjax_swiper();
-    }
-  });
 </script>
 
 
@@ -3126,7 +3020,6 @@ Qu...
   volantis.css("https://cdn.bootcdn.net/ajax/libs/pace/1.2.4/themes/blue/pace-theme-minimal.min.css");
   volantis.js("https://cdn.bootcdn.net/ajax/libs/pace/1.2.4/pace.min.js").then(() => {
     Pace.options.restartOnPushState = false;
-    volantis.pjax.send(Pace.restart);
     // 阅读进度
     volantis.scroll.push(() => {
       Pace.stop();
@@ -3139,10 +3032,7 @@ Qu...
 </script>
 
 
-<!-- pjax 标签必须存在于所有页面 否则 pjax error -->
-<pjax>
 
-</pjax>
 
 <script>
   function listenSidebarTOC() {
@@ -3255,7 +3145,6 @@ Qu...
   document.addEventListener("DOMContentLoaded", () => {
     volantis.requestAnimationFrame(listenSidebarTOC)
   });
-  volantis.pjax.push(listenSidebarTOC);
 </script>
 
 
@@ -3282,92 +3171,6 @@ Qu...
 
 
 
-      
-        <!--
-  pjax重载区域接口：
-  1.  <pjax></pjax> 标签 pjax 标签必须存在于所有页面 否则 pjax error
-  2.  script[data-pjax]
-  3.  .pjax-reload script
-  4.  .pjax
--->
-
-
-
-<script src="https://cdn.bootcdn.net/ajax/libs/pjax/0.2.8/pjax.min.js"></script>
-
-<script>
-    var pjax;
-    document.addEventListener('DOMContentLoaded', function () {
-      pjax = new Pjax({
-        elements: 'a[href]:not([href^="#"]):not([href="javascript:void(0)"]):not([pjax-fancybox]):not([onclick="return false;"]):not([onclick="return!1"]):not([target="_blank"]):not([target="view_window"]):not([href$=".xml"])',
-        // 这里的 selectors 需要保证每个页面都含有相同的数目
-        selectors: [
-          "head title",
-          "head meta[name=keywords]",
-          "head meta[name=description]",
-          
-          "#l_main",
-          "#pjax-header-nav-list",
-          ".pjax",
-          "pjax", // <pjax></pjax> 标签
-        ],
-        cacheBust: false,   // url 地址追加时间戳，用以避免浏览器缓存
-        timeout: 5000,
-        
-      });
-    });
-
-    document.addEventListener('pjax:send', function (e) {
-      //window.stop(); // 相当于点击了浏览器的停止按钮
-
-      try {
-        var currentUrl = window.location.pathname;
-        var targetUrl = e.triggerElement.href;
-        var excludeList = [""];
-        if (excludeList[0] != "") {
-          excludeList.forEach(item => {
-            if(currentUrl.indexOf(item) != -1 || targetUrl.indexOf(item) != -1) {
-              window.location.href = targetUrl;
-            }
-          });
-        }
-      } catch (error) {}
-
-      // 使用 volantis.pjax.send 方法传入pjax:send回调函数 参见layout/_partial/scripts/global.ejs
-      volantis.pjax.method.send.start();
-    });
-
-    document.addEventListener('pjax:complete', function () {
-      // 这里的 script 不需要保证每个页面都含有相同的数目
-      document.querySelectorAll('script[data-pjax], .pjax-reload script').forEach(e=>{
-        const code = e.text || e.textContent || e.innerHTML || '';
-        const script = document.createElement('script');
-        Object.keys(e.attributes).forEach(i=>{
-          script.setAttribute(e.attributes[i].nodeName,e.attributes[i].nodeValue)
-        })
-        if (code) {
-          script.appendChild(document.createTextNode(code));
-        }
-        e.parentNode.replaceChild(script, e);
-      });
-
-      // 使用 volantis.pjax.push 方法传入重载函数 参见layout/_partial/scripts/global.ejs
-      volantis.pjax.method.complete.start();
-    });
-
-    document.addEventListener('pjax:error', function (e) {
-      if(volantis.debug === "pjax") {
-        console.error(e);
-        console.log('pjax error: \n' + JSON.stringify(e));
-      }else{
-        // 使用 volantis.pjax.error 方法传入pjax:error回调函数 参见layout/_partial/scripts/global.ejs
-        volantis.pjax.method.error.start();
-        window.location.href = e.triggerElement.href;
-      }
-    });
-</script>
-
-      
     </div>
     <!-- import body_end begin-->
     <!-- import body_end end-->
